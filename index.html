@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi Entraînement Step</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="date"],
+        .form-group input[type="number"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .slider-container {
+            margin-top: 10px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            padding: 0 2px;
+        }
+
+        .slider-labels span {
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .slider-value {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .slider-current {
+            text-align: center;
+            font-weight: 600;
+            color: #667eea;
+            margin-top: 8px;
+            font-size: 16px;
+        }
+
+        .fc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .fc-input {
+            position: relative;
+        }
+
+        .fc-input label {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .result-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+        }
+
+        .result-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .result-box p {
+            margin: 5px 0;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .history {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .history h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .history-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .history-item .date {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .history-item .details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .history-item .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-item .detail-label {
+            font-weight: 600;
+            color: #333;
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+            font-size: 14px;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .form-container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .fc-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Suivi Entraînement Step</h1>
+            <p>Projet d'entraînement personnel - EPS Bac Pro</p>
+        </div>
+
+        <div class="form-container">
+            <form id="stepForm">
+                <!-- Pseudo -->
+                <div class="form-group">
+                    <label for="pseudo">Pseudo de l'élève *</label>
+                    <input type="text" id="pseudo" name="pseudo" required placeholder="Entrez votre pseudo">
+                </div>
+
+                <!-- Date -->
+                <div class="form-group">
+                    <label for="date">Date de la séance *</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+
+                <!-- État de forme début -->
+                <div class="form-group">
+                    <label for="formeDebut">État de forme en début de séance *</label>
+                    <div class="slider-container">
+                        <input type="range" id="formeDebut" name="formeDebut" min="1" max="5" value="3" step="1" class="slider">
+                        <div class="slider-labels">
+                            <span>1</span>
+                            <span>2</span>
+                            <span>3</span>
+                            <span>4</span>
+                            <span>5</span>
+                        </div>
+                        <div class="slider-value">
+                            <span>Mauvaise</span>
+                            <span>Optimale</span>
+                        </div>
+                        <div class="slider-current" id="formeDebutValue">3</div>
+                    </div>
+                </div>
+
+                <!-- Mobile d'entraînement -->
+                <div class="form-group">
+                    <label for="mobile">Mobile d'entraînement *</label>
+                    <select id="mobile" name="mobile" required>
+                        <option value="">-- Choisissez un mobile --</option>
+                        <option value="1">1 - Intensif</option>
+                        <option value="2">2 - Remise en forme</option>
+                        <option value="3">3 - Mémorisation</option>
+                    </select>
+                </div>
+
+                <!-- Fréquences cardiaques -->
+                <div class="form-group">
+                    <label>Fréquences Cardiaques à l'Effort (FCE)</label>
+                    <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Saisissez la FC après chaque séquence de travail (laisser vide si non effectuée)</p>
+                    <div class="fc-grid">
+                        <div class="fc-input">
+                            <label for="fce1">FCE 1 (bpm)</label>
+                            <input type="number" id="fce1" name="fce1" min="0" max="220" placeholder="ex: 120">
+                        </div>
+                        <div class="fc-input">
+                            <label for="fce2">FCE 2 (bpm)</label>
+                            <input type="number" id="fce2" name="fce2" min="0" max="220" placeholder="ex: 130">
+                        </div>
+                        <div class="fc-input">
+                            <label for="fce3">FCE 3 (bpm)</label>
+                            <input type="number" id="fce3" name="fce3" min="0" max="220" placeholder="ex: 140">
+                        </div>
+                        <div class="fc-input">
+                            <label for="fce4">FCE 4 (bpm)</label>
+                            <input type="number" id="fce4" name="fce4" min="0" max="220" placeholder="ex: 135">
+                        </div>
+                        <div class="fc-input">
+                            <label for="fce5">FCE 5 (bpm)</label>
+                            <input type="number" id="fce5" name="fce5" min="0" max="220" placeholder="ex: 125">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ressentis -->
+                <div class="form-group">
+                    <label for="ressentis">Ressentis après la séance (physiques et psychologiques) *</label>
+                    <textarea id="ressentis" name="ressentis" required placeholder="Décrivez vos ressentis physiques et psychologiques après la séance..."></textarea>
+                </div>
+
+                <!-- État de forme fin -->
+                <div class="form-group">
+                    <label for="formeFin">État de forme en fin de séance *</label>
+                    <div class="slider-container">
+                        <input type="range" id="formeFin" name="formeFin" min="1" max="5" value="3" step="1" class="slider">
+                        <div class="slider-labels">
+                            <span>1</span>
+                            <span>2</span>
+                            <span>3</span>
+                            <span>4</span>
+                            <span>5</span>
+                        </div>
+                        <div class="slider-value">
+                            <span>Mauvaise</span>
+                            <span>Optimale</span>
+                        </div>
+                        <div class="slider-current" id="formeFinValue">3</div>
+                    </div>
+                </div>
+
+                <!-- Résultat de calcul -->
+                <div class="result-box" id="resultBox">
+                    <h3>📈 Analyse de votre séance</h3>
+                    <p><strong>Moyenne FC:</strong> <span id="moyenneFC">-</span> bpm</p>
+                    <p><strong>Validation du projet:</strong> <span id="validiteProjet">-</span></p>
+                </div>
+
+                <!-- Message -->
+                <div class="message" id="message"></div>
+
+                <!-- Bouton d'enregistrement -->
+                <button type="submit" class="btn">💾 Enregistrer la séance</button>
+            </form>
+
+            <!-- Historique -->
+            <div class="history">
+                <h2>📋 Historique de vos séances</h2>
+                <div id="historyContainer">
+                    <p style="color: #999; text-align: center;">Aucune séance enregistrée pour le moment</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - REMPLACER PAR VOTRE URL DE WEB APP
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzpKbGbHt4TDdk37Wi5wBsHQ1s-Naiw6aShNv7qxNQ3B-9pyK4pA4J_g9Gq7DuTuJlSyg/exec';
+        const DEBUG_MODE = true; // Mettre à false en production
+
+        // Barèmes des mobiles (à adapter selon votre feuille "Barèmes")
+        const BAREMES = {
+            '1': { min: 150, max: 180, nom: 'Intensif' },      // Intensif
+            '2': { min: 120, max: 150, nom: 'Remise en forme' }, // Remise en forme
+            '3': { min: 130, max: 160, nom: 'Mémorisation' }     // Mémorisation
+        };
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Date du jour par défaut
+            document.getElementById('date').valueAsDate = new Date();
+
+            // Mise à jour des valeurs des sliders
+            updateSliderValue('formeDebut');
+            updateSliderValue('formeFin');
+
+            // Charger l'historique
+            loadHistory();
+        });
+
+        // Mise à jour affichage slider
+        function updateSliderValue(sliderId) {
+            const slider = document.getElementById(sliderId);
+            const display = document.getElementById(sliderId + 'Value');
+            
+            slider.addEventListener('input', function() {
+                display.textContent = this.value;
+            });
+        }
+
+        // Calculer la moyenne des FC saisies
+        function calculerMoyenneFC() {
+            const fces = [];
+            for (let i = 1; i <= 5; i++) {
+                const val = document.getElementById('fce' + i).value;
+                if (val && val.trim() !== '') {
+                    fces.push(parseFloat(val));
+                }
+            }
+
+            if (fces.length === 0) return null;
+            
+            const somme = fces.reduce((a, b) => a + b, 0);
+            return Math.round(somme / fces.length);
+        }
+
+        // Valider le projet
+        function validerProjet(mobile, moyenneFC) {
+            if (!moyenneFC || !mobile) return 'Non évalué';
+
+            const bareme = BAREMES[mobile];
+            if (!bareme) return 'Barème non trouvé';
+
+            if (moyenneFC >= bareme.min && moyenneFC <= bareme.max) {
+                return `✅ Validé - Projet ${bareme.nom} adapté`;
+            } else if (moyenneFC < bareme.min) {
+                return `⚠️ FC trop basse pour le projet ${bareme.nom} (min: ${bareme.min} bpm)`;
+            } else {
+                return `⚠️ FC trop élevée pour le projet ${bareme.nom} (max: ${bareme.max} bpm)`;
+            }
+        }
+
+        // Soumettre le formulaire
+        document.getElementById('stepForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Vérifier que l'URL est configurée
+            if (WEBAPP_URL === 'VOTRE_URL_WEBAPP_ICI') {
+                showMessage('❌ Erreur : Vous devez configurer WEBAPP_URL avec votre URL Google Apps Script', 'error');
+                return;
+            }
+
+            // Calculer moyenne et validation
+            const moyenneFC = calculerMoyenneFC();
+            const mobile = document.getElementById('mobile').value;
+            const validite = validerProjet(mobile, moyenneFC);
+
+            // Afficher le résultat
+            document.getElementById('moyenneFC').textContent = moyenneFC || 'Non calculable';
+            document.getElementById('validiteProjet').textContent = validite;
+            document.getElementById('resultBox').classList.add('show');
+
+            // Préparer les données
+            const formData = {
+                pseudo: document.getElementById('pseudo').value,
+                date: document.getElementById('date').value,
+                formeDebut: document.getElementById('formeDebut').value,
+                mobile: document.getElementById('mobile').value,
+                fce1: document.getElementById('fce1').value || '',
+                fce2: document.getElementById('fce2').value || '',
+                fce3: document.getElementById('fce3').value || '',
+                fce4: document.getElementById('fce4').value || '',
+                fce5: document.getElementById('fce5').value || '',
+                ressentis: document.getElementById('ressentis').value,
+                formeFin: document.getElementById('formeFin').value,
+                moyenneFC: moyenneFC || '',
+                validite: validite
+            };
+
+            if (DEBUG_MODE) {
+                console.log('📤 Envoi des données:', formData);
+                console.log('🌐 URL:', WEBAPP_URL);
+            }
+
+            // Enregistrer les données
+            try {
+                showMessage('⏳ Envoi en cours...', 'success');
+                
+                const response = await fetch(WEBAPP_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                    redirect: 'follow'
+                });
+
+                if (DEBUG_MODE) {
+                    console.log('📥 Réponse reçue:', response);
+                }
+
+                // Note: avec mode: 'no-cors', on ne peut pas lire la réponse
+                // donc on considère que c'est réussi si pas d'erreur
+                showMessage('✅ Séance enregistrée avec succès dans Google Sheets !', 'success');
+                
+                // Sauvegarder localement
+                saveToLocalStorage(formData);
+                
+                // Réinitialiser le formulaire
+                setTimeout(() => {
+                    document.getElementById('stepForm').reset();
+                    document.getElementById('date').valueAsDate = new Date();
+                    document.getElementById('formeDebut').value = 3;
+                    document.getElementById('formeFin').value = 3;
+                    document.getElementById('formeDebutValue').textContent = 3;
+                    document.getElementById('formeFinValue').textContent = 3;
+                    document.getElementById('resultBox').classList.remove('show');
+                    loadHistory();
+                }, 2000);
+
+            } catch (error) {
+                console.error('❌ Erreur complète:', error);
+                
+                // Sauvegarder localement même en cas d'erreur réseau
+                saveToLocalStorage(formData);
+                showMessage('⚠️ Erreur réseau. Séance sauvegardée localement. Vérifiez votre connexion et l\'URL du script.', 'error');
+                
+                if (DEBUG_MODE) {
+                    showMessage(`❌ Détails de l'erreur: ${error.message}. Vérifiez la console (F12)`, 'error');
+                }
+                
+                loadHistory();
+            }
+        });
+
+        // Sauvegarder localement
+        function saveToLocalStorage(data) {
+            let history = JSON.parse(localStorage.getItem('stepHistory') || '[]');
+            data.timestamp = new Date().toISOString();
+            history.unshift(data);
+            localStorage.setItem('stepHistory', JSON.stringify(history));
+        }
+
+        // Charger l'historique
+        function loadHistory() {
+            const pseudo = document.getElementById('pseudo').value;
+            let history = JSON.parse(localStorage.getItem('stepHistory') || '[]');
+            
+            // Filtrer par pseudo si renseigné
+            if (pseudo) {
+                history = history.filter(item => item.pseudo === pseudo);
+            }
+
+            const container = document.getElementById('historyContainer');
+            
+            if (history.length === 0) {
+                container.innerHTML = '<p style="color: #999; text-align: center;">Aucune séance enregistrée pour le moment</p>';
+                return;
+            }
+
+            container.innerHTML = history.map(item => `
+                <div class="history-item">
+                    <div class="date">📅 ${new Date(item.date).toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                    <div class="details">
+                        <div class="detail-item">
+                            <span class="detail-label">Mobile</span>
+                            <span>${item.mobile === '1' ? 'Intensif' : item.mobile === '2' ? 'Remise en forme' : 'Mémorisation'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Moyenne FC</span>
+                            <span>${item.moyenneFC || '-'} bpm</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Forme début → fin</span>
+                            <span>${item.formeDebut}/5 → ${item.formeFin}/5</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Validation</span>
+                            <span>${item.validite}</span>
+                        </div>
+                    </div>
+                    ${item.ressentis ? `<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd; font-size: 13px;"><strong>Ressentis:</strong> ${item.ressentis}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Afficher un message
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = 'message ' + type;
+            
+            setTimeout(() => {
+                messageEl.className = 'message';
+            }, 5000);
+        }
+
+        // Recharger l'historique quand le pseudo change
+        document.getElementById('pseudo').addEventListener('blur', loadHistory);
+    </script>
+</body>
+</html>
