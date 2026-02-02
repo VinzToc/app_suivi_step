@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi Step - EPS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .pseudo-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .pseudo-input {
+            flex: 1;
+        }
+
+        .btn-load {
+            padding: 12px 25px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn-load:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-load:active {
+            transform: translateY(0);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .slider-container {
+            padding: 10px 0;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .slider-value {
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-top: 10px;
+        }
+
+        .fce-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .fce-input {
+            text-align: center;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .result-value {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .valid {
+            color: #4caf50;
+        }
+
+        .invalid {
+            color: #f44336;
+        }
+
+        .history {
+            margin-top: 30px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .history.show {
+            display: block;
+        }
+
+        .history h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.9em;
+        }
+
+        .history-table th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .history-table tr:hover {
+            background: #f8f9ff;
+        }
+
+        .ressentis-cell {
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .fce-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏃‍♂️ Suivi Step</h1>
+        <p class="subtitle">Entraînement personnel - EPS Baccalauréat Professionnel</p>
+
+        <div id="alertBox" class="alert"></div>
+
+        <div class="history" id="historySection">
+            <h2>📜 Historique de mes séances</h2>
+            <div id="historyContent" class="loading"></div>
+        </div>
+
+        <form id="stepForm">
+            <div class="form-group">
+                <label for="pseudo">Pseudo de l'élève *</label>
+                <div class="pseudo-group">
+                    <div class="pseudo-input">
+                        <input type="text" id="pseudo" required placeholder="Entrez votre pseudo">
+                    </div>
+                    <button type="button" class="btn-load" id="loadHistoryBtn">📂 Charger historique</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="date">Date de la séance *</label>
+                <input type="date" id="date" required>
+            </div>
+
+            <div class="form-group">
+                <label for="formeAvant">État de forme avant la séance</label>
+                <div class="slider-container">
+                    <input type="range" id="formeAvant" min="1" max="5" value="3">
+                    <div class="slider-value" id="formeAvantValue">3 - Forme moyenne</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="mobile">Mobile d'entraînement *</label>
+                <select id="mobile" required>
+                    <option value="">-- Choisissez un mobile --</option>
+                    <option value="1">1 - Intensif (180-210 bpm)</option>
+                    <option value="2">2 - Remise en forme (150-179 bpm)</option>
+                    <option value="3">3 - Mémorisation (130-149 bpm)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="series">Choix des séries *</label>
+                <select id="series" required>
+                    <option value="">-- Choisissez vos séries --</option>
+                    <option value="5x4'">5 x 4'</option>
+                    <option value="4x5'">4 x 5'</option>
+                    <option value="3x6'">3 x 6'</option>
+                    <option value="3x7'">3 x 7'</option>
+                    <option value="3x8'">3 x 8'</option>
+                    <option value="2x12'">2 x 12'</option>
+                    <option value="2x14'">2 x 14'</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Fréquences Cardiaques à l'Effort (FCE) - en bpm</label>
+                <p style="font-size: 0.85em; color: #666; margin-bottom: 10px;">Saisissez au moins une FCE</p>
+                <div class="fce-grid">
+                    <div class="fce-input">
+                        <label for="fce1">FCE 1</label>
+                        <input type="number" id="fce1" min="0" max="250" placeholder="bpm">
+                    </div>
+                    <div class="fce-input">
+                        <label for="fce2">FCE 2</label>
+                        <input type="number" id="fce2" min="0" max="250" placeholder="bpm">
+                    </div>
+                    <div class="fce-input">
+                        <label for="fce3">FCE 3</label>
+                        <input type="number" id="fce3" min="0" max="250" placeholder="bpm">
+                    </div>
+                    <div class="fce-input">
+                        <label for="fce4">FCE 4</label>
+                        <input type="number" id="fce4" min="0" max="250" placeholder="bpm">
+                    </div>
+                    <div class="fce-input">
+                        <label for="fce5">FCE 5</label>
+                        <input type="number" id="fce5" min="0" max="250" placeholder="bpm">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="ressentis">Ressentis après la séance</label>
+                <textarea id="ressentis" placeholder="Décrivez vos ressentis physiques et psychologiques..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="formeApres">État de forme après la séance</label>
+                <div class="slider-container">
+                    <input type="range" id="formeApres" min="1" max="5" value="3">
+                    <div class="slider-value" id="formeApresValue">3 - Forme moyenne</div>
+                </div>
+            </div>
+
+            <div class="results" id="results">
+                <h3 style="color: #667eea; margin-bottom: 15px;">📊 Résultats de la séance</h3>
+                <div class="result-item">
+                    <span class="result-label">Moyenne FC :</span>
+                    <span class="result-value" id="moyenneFC">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Validité du projet :</span>
+                    <span class="result-value" id="validite">-</span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">💾 Enregistrer la séance</button>
+        </form>
+    </div>
+
+    <script>
+        // Configuration - REMPLACEZ PAR VOTRE URL WEB APP
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxAw-7Qgc_eTKY-gc6eyQ-hSzdJGCbBXgrDLKOLOp4LxN-4lKoVFB0E0VZ-ZxDGfJK_Jg/exec';
+
+        // Labels pour les curseurs de forme
+        const formeLabels = {
+            1: '1 - Mauvaise forme',
+            2: '2 - Forme faible',
+            3: '3 - Forme moyenne',
+            4: '4 - Bonne forme',
+            5: '5 - Forme optimale'
+        };
+
+        // Mise à jour des labels des curseurs
+        document.getElementById('formeAvant').addEventListener('input', function() {
+            document.getElementById('formeAvantValue').textContent = formeLabels[this.value];
+        });
+
+        document.getElementById('formeApres').addEventListener('input', function() {
+            document.getElementById('formeApresValue').textContent = formeLabels[this.value];
+        });
+
+        // Calcul de la moyenne et validation en temps réel
+        function calculateResults() {
+            const mobile = document.getElementById('mobile').value;
+            const fces = [
+                document.getElementById('fce1').value,
+                document.getElementById('fce2').value,
+                document.getElementById('fce3').value,
+                document.getElementById('fce4').value,
+                document.getElementById('fce5').value
+            ].filter(v => v !== '').map(Number);
+
+            if (mobile && fces.length > 0) {
+                const moyenne = Math.round(fces.reduce((a, b) => a + b, 0) / fces.length);
+                document.getElementById('moyenneFC').textContent = moyenne + ' bpm';
+
+                let validite = '';
+                let validiteClass = '';
+
+                if (mobile === '1') {
+                    if (moyenne >= 180 && moyenne <= 210) {
+                        validite = '✅ Valide';
+                        validiteClass = 'valid';
+                    } else if (moyenne < 180) {
+                        validite = '❌ Non valide - FC trop basse';
+                        validiteClass = 'invalid';
+                    } else {
+                        validite = '❌ Non valide - FC trop haute';
+                        validiteClass = 'invalid';
+                    }
+                } else if (mobile === '2') {
+                    if (moyenne >= 150 && moyenne <= 179) {
+                        validite = '✅ Valide';
+                        validiteClass = 'valid';
+                    } else if (moyenne < 150) {
+                        validite = '❌ Non valide - FC trop basse';
+                        validiteClass = 'invalid';
+                    } else {
+                        validite = '❌ Non valide - FC trop haute';
+                        validiteClass = 'invalid';
+                    }
+                } else if (mobile === '3') {
+                    if (moyenne >= 130 && moyenne <= 149) {
+                        validite = '✅ Valide';
+                        validiteClass = 'valid';
+                    } else if (moyenne < 130) {
+                        validite = '❌ Non valide - FC trop basse';
+                        validiteClass = 'invalid';
+                    } else {
+                        validite = '❌ Non valide - FC trop haute';
+                        validiteClass = 'invalid';
+                    }
+                }
+
+                const validiteEl = document.getElementById('validite');
+                validiteEl.textContent = validite;
+                validiteEl.className = 'result-value ' + validiteClass;
+
+                document.getElementById('results').classList.add('show');
+            } else {
+                document.getElementById('results').classList.remove('show');
+            }
+        }
+
+        // Écouter les changements pour le calcul en temps réel
+        document.getElementById('mobile').addEventListener('change', calculateResults);
+        ['fce1', 'fce2', 'fce3', 'fce4', 'fce5'].forEach(id => {
+            document.getElementById(id).addEventListener('input', calculateResults);
+        });
+
+        // Initialiser la date du jour
+        document.getElementById('date').valueAsDate = new Date();
+
+        // Afficher une alerte
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.textContent = message;
+            alertBox.className = 'alert alert-' + type + ' show';
+            setTimeout(() => {
+                alertBox.classList.remove('show');
+            }, 5000);
+        }
+
+        // Soumettre le formulaire
+        document.getElementById('stepForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const fces = [
+                document.getElementById('fce1').value,
+                document.getElementById('fce2').value,
+                document.getElementById('fce3').value,
+                document.getElementById('fce4').value,
+                document.getElementById('fce5').value
+            ].filter(v => v !== '');
+
+            if (fces.length === 0) {
+                showAlert('⚠️ Veuillez saisir au moins une Fréquence Cardiaque à l\'Effort', 'error');
+                return;
+            }
+
+            const data = {
+                action: 'addSession',
+                pseudo: document.getElementById('pseudo').value,
+                date: document.getElementById('date').value,
+                formeAvant: document.getElementById('formeAvant').value,
+                mobile: document.getElementById('mobile').value,
+                series: document.getElementById('series').value,
+                fce1: document.getElementById('fce1').value || '',
+                fce2: document.getElementById('fce2').value || '',
+                fce3: document.getElementById('fce3').value || '',
+                fce4: document.getElementById('fce4').value || '',
+                fce5: document.getElementById('fce5').value || '',
+                ressentis: document.getElementById('ressentis').value,
+                formeApres: document.getElementById('formeApres').value
+            };
+
+            try {
+                const response = await fetch(WEBAPP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showAlert('✅ Séance enregistrée avec succès !', 'success');
+                    
+                    // Réinitialiser les champs FCE et ressentis
+                    ['fce1', 'fce2', 'fce3', 'fce4', 'fce5'].forEach(id => {
+                        document.getElementById(id).value = '';
+                    });
+                    document.getElementById('ressentis').value = '';
+                    document.getElementById('results').classList.remove('show');
+                    
+                    // Recharger l'historique automatiquement
+                    setTimeout(loadHistory, 500);
+                } else {
+                    showAlert('❌ Erreur lors de l\'enregistrement : ' + result.message, 'error');
+                }
+            } catch (error) {
+                showAlert('❌ Erreur de connexion. Vérifiez l\'URL de l\'application.', 'error');
+                console.error('Erreur:', error);
+            }
+        });
+
+        // Charger l'historique
+        async function loadHistory() {
+            const pseudo = document.getElementById('pseudo').value.trim();
+            if (!pseudo) {
+                showAlert('⚠️ Veuillez entrer votre pseudo pour charger l\'historique', 'error');
+                return;
+            }
+
+            document.getElementById('historyContent').innerHTML = '<p class="loading">Chargement de l\'historique...</p>';
+            document.getElementById('historySection').classList.add('show');
+
+            try {
+                const response = await fetch(WEBAPP_URL + '?action=getHistory&pseudo=' + encodeURIComponent(pseudo));
+                const result = await response.json();
+
+                if (result.status === 'success' && result.data.length > 0) {
+                    let html = '<table class="history-table"><thead><tr>';
+                    html += '<th>Date</th><th>Mobile</th><th>Séries</th><th>Moyenne FC</th><th>Validité</th><th>Ressentis</th>';
+                    html += '</tr></thead><tbody>';
+
+                    result.data.forEach(row => {
+                        const mobileNames = {'1': 'Intensif', '2': 'Remise en forme', '3': 'Mémorisation'};
+                        
+                        // Formater la date au format JJ/MM/AA
+                        let dateFormatted = row.date;
+                        if (row.date && row.date.includes('GMT')) {
+                            // Si c'est un objet Date converti en string
+                            const d = new Date(row.date);
+                            const day = String(d.getDate()).padStart(2, '0');
+                            const month = String(d.getMonth() + 1).padStart(2, '0');
+                            const year = String(d.getFullYear()).slice(-2);
+                            dateFormatted = day + '/' + month + '/' + year;
+                        } else if (row.date && !row.date.includes('/')) {
+                            // Si c'est une date ISO (YYYY-MM-DD)
+                            const parts = row.date.split('-');
+                            if (parts.length === 3) {
+                                const day = parts[2].padStart(2, '0');
+                                const month = parts[1].padStart(2, '0');
+                                const year = parts[0].slice(-2);
+                                dateFormatted = day + '/' + month + '/' + year;
+                            }
+                        }
+                        
+                        html += '<tr>';
+                        html += '<td>' + dateFormatted + '</td>';
+                        html += '<td>' + mobileNames[row.mobile] + '</td>';
+                        html += '<td>' + row.series + '</td>';
+                        html += '<td>' + row.moyenne + ' bpm</td>';
+                        html += '<td class="' + (row.validite.includes('Valide') && !row.validite.includes('Non') ? 'valid' : 'invalid') + '">' + row.validite + '</td>';
+                        html += '<td class="ressentis-cell" title="' + (row.ressentis || '') + '">' + (row.ressentis || '-') + '</td>';
+                        html += '</tr>';
+                    });
+
+                    html += '</tbody></table>';
+                    document.getElementById('historyContent').innerHTML = html;
+                    showAlert('✅ Historique chargé : ' + result.data.length + ' séance(s) trouvée(s)', 'success');
+                } else {
+                    document.getElementById('historyContent').innerHTML = '<p style="text-align: center; color: #666;">Aucune séance enregistrée pour ce pseudo</p>';
+                    showAlert('ℹ️ Aucune séance trouvée pour ce pseudo', 'error');
+                }
+            } catch (error) {
+                document.getElementById('historyContent').innerHTML = '<p style="text-align: center; color: #f44336;">Erreur de chargement de l\'historique. Vérifiez l\'URL de l\'application.</p>';
+                showAlert('❌ Erreur de connexion. Vérifiez l\'URL de l\'application.', 'error');
+                console.error('Erreur:', error);
+            }
+        }
+
+        // Bouton pour charger l'historique
+        document.getElementById('loadHistoryBtn').addEventListener('click', loadHistory);
+
+        // Charger l'historique au démarrage si un pseudo est sauvegardé
+        window.addEventListener('load', function() {
+            const savedPseudo = localStorage.getItem('stepPseudo');
+            if (savedPseudo) {
+                document.getElementById('pseudo').value = savedPseudo;
+            }
+        });
+
+        // Sauvegarder le pseudo
+        document.getElementById('pseudo').addEventListener('change', function() {
+            localStorage.setItem('stepPseudo', this.value);
+        });
+    </script>
+</body>
+</html>
